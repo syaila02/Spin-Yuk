@@ -53,6 +53,9 @@ web_modules/
 # Optional eslint cache
 .eslintcache
 
+# Local dev server logs
+web/dev-server*.log
+
 # Optional stylelint cache
 .stylelintcache
 
@@ -77,6 +80,10 @@ web_modules/
 # Next.js build output
 .next
 out
+
+# next-pwa generated service worker output
+web/public/sw.js
+web/public/workbox-*.js
 
 # Nuxt.js build / generate output
 .nuxt
