@@ -212,8 +212,7 @@ export default function DashboardPage() {
   const resultText = result?.label ?? "-";
 
   useEffect(() => {
-    const updatedRoomState = { ...roomState, updatedAt: new Date().toISOString() };
-    localStorage.setItem(getRoomKey(roomCode), JSON.stringify(updatedRoomState));
+    localStorage.setItem(getRoomKey(roomCode), JSON.stringify(roomState));
     localStorage.setItem("spin-yuk-options", JSON.stringify(roomState.options));
     localStorage.setItem("spin-yuk-history-items", JSON.stringify(roomState.history));
     localStorage.setItem("spin-options", JSON.stringify(roomState.options.map((option) => option.label)));
@@ -226,8 +225,12 @@ export default function DashboardPage() {
 
       try {
         const nextState = JSON.parse(event.newValue) as RoomState;
-        setRoomState(nextState);
-        toast.success("Room synced from another tab");
+        setRoomState((current) => {
+          if (JSON.stringify(current) === event.newValue) return current;
+
+          toast.success("Room synced from another tab");
+          return nextState;
+        });
       } catch {
         toast.error("Unable to sync room update");
       }
