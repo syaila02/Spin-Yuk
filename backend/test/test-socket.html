@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Test WebSocket</title>
+</head>
+<body>
+
+<h2>WebSocket Test</h2>
+
+<input id="roomId" placeholder="Room ID" value="1" />
+<input id="spinnerId" placeholder="Spinner ID" value="1" />
+
+<button onclick="joinRoom()">Join Room</button>
+<button onclick="spin()">Spin</button>
+
+<h3>Result:</h3>
+<p id="result">-</p>
+
+<script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+
+<script>
+  const socket = io("http://localhost:5000");
+
+  function joinRoom() {
+    const roomId = document.getElementById("roomId").value;
+    socket.emit("joinRoom", roomId);
+    console.log("Joined room:", roomId);
+  }
+
+  function spin() {
+    const roomId = document.getElementById("roomId").value;
+    const spinnerId = document.getElementById("spinnerId").value;
+
+    socket.emit("spin", {
+      roomId,
+      spinnerId
+    });
+  }
+
+  socket.on("spinResult", (result) => {
+    console.log("Hasil:", result);
+    document.getElementById("result").innerText = result;
+  });
+</script>
+
+</body>
+</html>

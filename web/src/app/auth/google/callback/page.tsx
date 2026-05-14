@@ -2,35 +2,45 @@
 
 import { Suspense, useEffect } from "react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 function GoogleCallbackContent() {
+  const router = useRouter();
   const searchParams = useSearchParams();
-  const code = searchParams.get("code");
+  const token = searchParams.get("token");
 
   useEffect(() => {
-    if (!code) return;
+    if (!token) return;
+
+    localStorage.setItem("token", token);
+
+    const payload = JSON.parse(atob(token.split(".")[1]));
 
     localStorage.setItem(
       "spin-yuk-google-profile",
       JSON.stringify({
-        name: "Google User",
-        email: "google.user@example.com",
+        name: payload.name,
+        email: payload.email,
       })
     );
-  }, [code]);
+
+    router.push("/dashboard");
+  }, [token, router]);
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-[#050816] px-6 text-white">
       <section className="w-full max-w-xl rounded-[28px] border border-white/10 bg-[#09101f] p-8 text-center">
-        <p className="text-xs uppercase tracking-[0.3em] text-zinc-500">Google OAuth</p>
+        <p className="text-xs uppercase tracking-[0.3em] text-zinc-500">
+          Google OAuth
+        </p>
         <h1 className="mt-4 text-3xl font-black">Authentication callback</h1>
         <p className="mt-4 text-zinc-400">
-          {code
-            ? "Google authorization code received. Backend /auth/google can exchange it for JWT later."
-            : "Missing Google authorization code."}
+          {token ? "Login berhasil. Mengarahkan ke dashboard..." : "Token tidak ditemukan."}
         </p>
-        <Link href="/dashboard" className="mt-8 inline-flex rounded-2xl bg-purple-600 px-6 py-3 font-semibold text-white">
+        <Link
+          href="/dashboard"
+          className="mt-8 inline-flex rounded-2xl bg-purple-600 px-6 py-3 font-semibold text-white"
+        >
           Open dashboard
         </Link>
       </section>
