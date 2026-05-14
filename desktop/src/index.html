@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SpinYuk Desktop</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+    <button id="sidebarToggle" class="sidebar-toggle spin-logo-toggle" aria-label="Buka sidebar">
+        <span class="mini-wheel-logo">
+            <span class="mini-wheel-center"></span>
+        </span>
+    </button>
+
+    <div id="sidebarOverlay" class="sidebar-overlay"></div>
+
+    <aside id="appSidebar" class="app-sidebar">
+    <div class="sidebar-header">
+        <div>
+        <h2>Menu</h2>
+        </div>
+
+        <button id="sidebarClose" class="sidebar-close">×</button>
+    </div>
+
+    <nav class="sidebar-nav">
+        <button class="sidebar-link active" data-menu="quick-spin">
+        <span>QS</span>
+        Quick Spin
+        </button>
+
+        <button class="sidebar-link" data-menu="group-spin">
+        <span>GS</span>
+        Group Spin
+        </button>
+    </nav>
+
+    </aside>
+
+    <div id="toastCard" class="toast-card">
+        <div class="toast-panel">
+            <div class="toast-glow"></div>
+
+            <div class="toast-body">
+                <p id="toastTitle">Notifikasi</p>
+                <h3 id="toastMessage">Pesan notifikasi</h3>
+                <button id="toastOkBtn" class="toast-ok-btn">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="resetConfirmCard" class="reset-confirm-card">
+        <div class="reset-confirm-panel">
+            <div class="reset-confirm-body">
+                <p>Reset Room</p>
+                <h3>Yakin ingin mengosongkan semua data?</h3>
+                <span>Nama room, nama pengguna, daftar pilihan, hasil spin, dan riwayat akan dihapus dari penyimpanan lokal.</span>
+
+                <div class="reset-confirm-actions">
+                    <button id="resetCancelBtn" class="reset-cancel-btn">Batal</button>
+                    <button id="resetYesBtn" class="reset-yes-btn">Reset Sekarang</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="groupResetConfirmCard" class="reset-confirm-card">
+        <div class="reset-confirm-panel">
+            <div class="reset-confirm-body">
+                <p>Reset Group Spin</p>
+                <h3>Yakin ingin menghapus semua data Group Spin?</h3>
+                <span>Daftar nama, hasil kelompok, progress, dan hasil spin kelompok akan dikosongkan.</span>
+
+                <div class="reset-confirm-actions">
+                    <button id="groupResetCancelBtn" class="reset-cancel-btn">Batal</button>
+                    <button id="groupResetYesBtn" class="reset-yes-btn">Reset Sekarang</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+  <div class="app">
+    <header class="header hero-header">
+        <div class="hero-content">
+            <p class="hero-kicker">SPINYUK DESKTOP APPLICATION</p>
+
+            <h1 class="hero-title">
+            SpinYuk <span>Desktop</span>
+            </h1>
+
+            <p class="hero-description">
+            Aplikasi spinner interaktif berbasis desktop untuk memilih keputusan, membagi kelompok,
+            dan mengelola hasil secara cepat melalui fitur platform desktop.
+            </p>
+
+        </div>
+
+        <div class="hero-action-card">
+            <p>Active Mode</p>
+            <h2>Quick Spin</h2>
+            <span>Gunakan sidebar untuk berpindah mode</span>
+        </div>
+    </header>
+
+    <main class="main-layout">
+      <section class="left-panel">
+        <div class="card room-card">
+          <h2>Informasi Room</h2>
+
+          <label>Nama Room</label>
+          <input type="text" id="roomName" placeholder="Contoh: Pilih Tempat Makan" />
+
+          <label>Nama Pengguna</label>
+          <input type="text" id="userName" placeholder="Contoh: Aam" />
+
+          <p class="hint">
+            Untuk sementara data berjalan secara lokal di desktop. Nanti bisa disambungkan ke backend temanmu.
+          </p>
+        </div>
+
+        <div class="card">
+          <h2>Tambah Pilihan</h2>
+
+          <div class="input-row">
+            <input type="text" id="itemInput" placeholder="Masukkan pilihan..." />
+            <button id="addBtn">Tambah</button>
+          </div>
+
+          <div id="dropZone" class="drop-zone">
+            Drag & drop file .txt atau .json ke sini untuk import pilihan.
+          </div>
+
+          <button class="secondary-btn" id="importBtn">Import Pilihan dari File</button>
+
+          <label class="remove-winner-option">
+            <input type="checkbox" id="removeWinnerToggle" />
+            <span>Hapus hasil setelah spin</span>
+          </label>
+
+          <div class="items-header">
+            <h3>Daftar Pilihan</h3>
+            <button class="danger-btn" id="clearBtn">Hapus Semua</button>
+          </div>
+
+          <ul id="itemList" class="item-list"></ul>
+        </div>
+      </section>
+
+      <section class="center-panel">
+        <div class="wheel-card">
+          <div class="pointer"></div>
+
+          <div class="wheel-wrapper">
+            <canvas id="wheelCanvas" width="420" height="420"></canvas>
+          </div>
+
+          <button id="spinBtn" class="spin-btn">SPIN SEKARANG</button>
+
+          <div class="result-box">
+            <p>Hasil Terpilih</p>
+            <h2 id="resultText">Belum ada hasil</h2>
+          </div>
+
+          <button id="focusModeBtn" class="focus-mode-btn">Focus Mode</button>
+          <button id="resetBtn" class="danger-outline-btn">Reset Room</button>
+        </div>
+      </section>
+
+      <section class="right-panel">
+        <div class="card">
+            <div class="history-header">
+                <h2>Riwayat Spin</h2>
+                <button class="small-export-btn" id="exportBtn">Export</button>
+            </div>
+
+            <div id="historyList" class="history-list">
+                <p class="empty-text">Belum ada riwayat spin.</p>
+            </div>
+        </div>
+        
+        <div class="card stats-card">
+            <h2>Statistik Quick Spin</h2>
+
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <p>Total Pilihan</p>
+                    <strong id="totalOptionsStat">0</strong>
+                </div>
+
+                <div class="stat-item">
+                    <p>Total Spin</p>
+                    <strong id="totalSpinStat">0</strong>
+                </div>
+
+                <div class="stat-item">
+                    <p>Hasil Terakhir</p>
+                    <strong id="lastResultStat">-</strong>
+                </div>
+
+                <div class="stat-item">
+                    <p>Remove Winner</p>
+                    <strong id="removeWinnerStat">Nonaktif</strong>
+                </div>
+            </div>
+        </div>
+
+        <div class="card feature-card">
+            <h2>Fitur Desktop</h2>
+
+            <div class="feature-item">
+                <strong>System Tray</strong>
+                <p>Aplikasi tetap berjalan di background dan dapat dibuka kembali melalui ikon tray.</p>
+            </div>
+
+            <div class="feature-item">
+                <strong>Global Shortcut</strong>
+                <p>Pengguna dapat menampilkan atau menyembunyikan aplikasi menggunakan Ctrl + Shift + S.</p>
+            </div>
+
+            <div class="feature-item">
+                <strong>File Import</strong>
+                <p>Pengguna dapat menambahkan pilihan spinner dari file .txt atau .json.</p>
+            </div>
+
+            <div class="feature-item">
+                <strong>Drag and Drop</strong>
+                <p>File pilihan dapat ditarik langsung ke area import untuk mempercepat input data.</p>
+            </div>
+
+            <div class="feature-item">
+                <strong>Export History</strong>
+                <p>Riwayat hasil spin dapat disimpan ke file lokal sebagai dokumentasi.</p>
+            </div>
+
+            <div class="feature-item">
+                <strong>Reset Room</strong>
+                <p>Data room, pilihan, hasil, dan riwayat dapat dikosongkan melalui konfirmasi khusus.</p>
+            </div>
+        </div>
+      </section>
+    </main>
+    <section id="groupSpinPage" class="group-spin-page">
+    <div class="group-layout">
+        <div class="card group-input-card">
+        <h2>Group Spin</h2>
+        <p class="hint">
+            Masukkan daftar nama, tentukan jumlah kelompok, lalu spin nama satu per satu untuk membagi anggota secara acak.
+        </p>
+
+        <label>Daftar Nama</label>
+        <textarea id="groupNamesInput" placeholder="Contoh:
+    Aam
+    Syaila
+    Kibar
+    Auliya"></textarea>
+
+        <div id="groupDropZone" class="group-drop-zone">
+            Drag & drop file .txt atau .json ke sini untuk import nama.
+        </div>
+
+        <button id="groupImportBtn" class="secondary-btn group-import-btn">
+            Import Nama dari File
+        </button>
+
+        <div class="group-config">
+            <div>
+            <label>Jumlah Kelompok</label>
+            <input type="number" id="groupCountInput" min="1" value="6" />
+            </div>
+
+            <div>
+            <label>Anggota per Kelompok</label>
+            <input type="number" id="memberPerGroupInput" min="1" value="5" />
+            </div>
+        </div>
+
+        <button id="prepareGroupBtn" class="spin-btn">Siapkan Group Spin</button>
+
+        <div class="group-info-box">
+            <p id="groupProgressText">Belum ada data kelompok.</p>
+        </div>
+        </div>
+
+        <div class="wheel-card group-wheel-card">
+        <div class="pointer"></div>
+
+        <div class="wheel-wrapper">
+            <canvas id="groupWheelCanvas" width="420" height="420"></canvas>
+        </div>
+
+        <button id="groupSpinBtn" class="spin-btn">SPIN NAMA</button>
+
+        <div class="result-box">
+            <p>Nama Terpilih</p>
+            <h2 id="groupResultText">Belum ada hasil</h2>
+        </div>
+
+        <button id="resetGroupBtn" class="danger-outline-btn">Reset Group Spin</button>
+        </div>
+
+        <div class="card group-result-card">
+            <div class="history-header">
+                <h2>Hasil Kelompok</h2>
+                <button id="groupExportBtn" class="small-export-btn">Export</button>
+            </div>
+
+            <div id="groupResultContainer" class="group-result-container">
+        </div>
+    </div>
+    </section>
+  </div>
+
+  <script src="renderer.js"></script>
+</body>
+</html>
