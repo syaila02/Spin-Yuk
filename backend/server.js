@@ -58,14 +58,24 @@ const io = new Server(server, {
   },
 });
 
+// Track users per room
+const roomUsers = {};
+
 io.on("connection", (socket) => {
   console.log("🔌 User connected:", socket.id);
 
   // JOIN ROOM
-  socket.on("joinRoom", (roomId) => {
+  socket.on("joinRoom", ({ roomId, userName }) => {
+    socket.userName = userName;
     socket.join(roomId);
 
-    console.log(`User ${socket.id} joined room ${roomId}`);
+    if (!roomUsers[roomId]) roomUsers[roomId] = [];
+    if (!roomUsers[roomId].includes(userName)) {
+      roomUsers[roomId].push(userName);
+      socket.to(roomId).emit("userJoined", userName);
+    }
+
+    console.log(`User ${userName} joined room ${roomId}`);
   });
 
   // SPIN
@@ -113,6 +123,15 @@ io.on("connection", (socket) => {
 
   socket.on("disconnect", () => {
     console.log("❌ User disconnected:", socket.id);
+    // Find and remove user from rooms
+    for (const roomId in roomUsers) {
+      const index = roomUsers[roomId].indexOf(socket.userName);
+      if (index > -1) {
+        const userName = roomUsers[roomId][index];
+        roomUsers[roomId].splice(index, 1);
+        socket.to(roomId).emit("userLeft", userName);
+      }
+    }
   });
 });
 

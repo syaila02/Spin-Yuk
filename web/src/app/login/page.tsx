@@ -2,34 +2,38 @@
 
 import Link from "next/link";
 import toast from "react-hot-toast";
+import ThemeToggle from "@/components/ThemeToggle";
 import { ArrowLeft, Lock, Mail } from "lucide-react";
 
 export default function LoginPage() {
   const handleGoogleLogin = () => {
-    window.location.href = "http://localhost:5000/api/auth/google";
+    const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000";
+    window.location.href = `${backendUrl}/api/auth/google`;
   };
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-[#050816] px-6 py-10 text-white">
+    <main className="relative flex min-h-screen items-center justify-center bg-slate-950 px-6 py-10 text-white">
       <Link
         href="/"
-        className="absolute left-6 top-6 inline-flex items-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-zinc-300 transition hover:text-white"
+        className="absolute left-6 top-6 inline-flex items-center gap-2 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-slate-200 transition hover:text-white"
       >
         <ArrowLeft size={18} />
         Back
       </Link>
 
-      <section className="w-full max-w-xl rounded-[28px] border border-white/10 bg-[#09101f]/90 p-7 shadow-[0_45px_120px_rgba(0,0,0,0.2)] sm:p-9">
-        <div className="text-center">
-          <p className="text-xs uppercase tracking-[0.3em] text-zinc-500">
-            Welcome back
-          </p>
-          <h1 className="mt-4 text-4xl font-black">Login to Spin-Yuk</h1>
-          <p className="mt-4 text-zinc-400">
-            Google login unlocks profile identity, host attribution, and future
-            cross-device room sync.
-          </p>
+      <section className="w-full max-w-xl rounded-[32px] border border-white/10 bg-white/5 p-8 shadow-[0_40px_120px_rgba(15,23,42,0.35)] backdrop-blur-xl sm:p-10">
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <p className="text-xs uppercase tracking-[0.3em] text-slate-400">
+              Welcome back
+            </p>
+            <h1 className="mt-4 text-4xl font-black text-white">Login to Spin-Yuk</h1>
+          </div>
+          <ThemeToggle />
         </div>
+        <p className="mt-4 max-w-xl text-slate-300">
+          Google login unlocks profile identity, host attribution, and cross-device room updates.
+        </p>
 
         <form
           className="mt-8 space-y-5"
@@ -77,16 +81,16 @@ export default function LoginPage() {
         <button
           type="button"
           onClick={handleGoogleLogin}
-          className="mt-4 w-full rounded-2xl border border-white/10 bg-white/5 py-4 font-semibold text-white transition hover:bg-white/10"
+          className="mt-4 w-full rounded-2xl bg-gradient-to-r from-violet-500 to-cyan-400 px-5 py-4 text-base font-semibold text-slate-950 shadow-[0_20px_60px_rgba(56,189,248,0.18)] transition hover:-translate-y-0.5"
         >
           Continue with Google
         </button>
 
-        <p className="mt-8 text-center text-zinc-400">
+        <p className="mt-8 text-center text-slate-300">
           Don&apos;t have an account?{" "}
           <Link
             href="/register"
-            className="font-semibold text-purple-300 hover:text-purple-200"
+            className="font-semibold text-cyan-300 hover:text-cyan-200"
           >
             Register
           </Link>

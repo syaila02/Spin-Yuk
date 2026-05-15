@@ -1,25 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import { ArrowLeft, Lock, Mail, User } from "lucide-react";
-import { getGoogleOAuthUrl, saveDemoGoogleProfile } from "@/lib/google-auth";
 
 export default function RegisterPage() {
-  const router = useRouter();
-
   const handleGoogleLogin = () => {
-    const url = getGoogleOAuthUrl();
-
-    if (url) {
-      window.location.href = url;
-      return;
-    }
-
-    saveDemoGoogleProfile();
-    toast.success("Google demo profile connected");
-    router.push("/dashboard");
+    const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:5000";
+    window.location.href = `${backendUrl}/api/auth/google`;
   };
 
   return (
