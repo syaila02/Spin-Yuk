@@ -483,7 +483,19 @@ function spinWheel() {
 
   setTimeout(() => {
     const winner = items[winnerIndex];
-
+    fetch("http://localhost:5000/api/spinner/history", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        result: winner,
+      }),
+    })
+      .then((res) => res.json())
+      .then((data) => console.log("History saved to backend:", data))
+      .catch((err) => console.error("Gagal simpan history:", err));
+      
     const now = new Date();
     const time = now.toLocaleString("id-ID", {
       dateStyle: "medium",

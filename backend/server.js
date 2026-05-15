@@ -6,24 +6,16 @@ const http = require("http");
 const session = require("express-session");
 const { Server } = require("socket.io");
 
-// DATABASE
 const db = require("./database");
-
-// GOOGLE AUTH
 const passport = require("./googleAuth");
 
-// ROUTES
 const authRoutes = require("./routes/auth");
 const roomRoutes = require("./routes/room");
 const spinnerRoutes = require("./routes/spinner");
 
 const app = express();
 
-// ==========================
-// MIDDLEWARE
-// ==========================
 app.use(cors());
-
 app.use(express.json());
 
 app.use(
@@ -36,9 +28,6 @@ app.use(
 
 app.use(passport.initialize());
 
-// ==========================
-// ROUTES
-// ==========================
 app.use("/api/auth", authRoutes);
 app.use("/api/room", roomRoutes);
 app.use("/api/spinner", spinnerRoutes);
@@ -47,37 +36,32 @@ app.get("/", (req, res) => {
   res.send("API SQLite + WebSocket + Google OAuth running...");
 });
 
-// ==========================
-// WEBSOCKET
-// ==========================
 const server = http.createServer(app);
 
 const io = new Server(server, {
-  cors: {
-    origin: "*",
-  },
+  cors: { origin: "*" },
 });
 
 io.on("connection", (socket) => {
   console.log("🔌 User connected:", socket.id);
 
-  // JOIN ROOM
   socket.on("joinRoom", (roomId) => {
     socket.join(roomId);
-
     console.log(`User ${socket.id} joined room ${roomId}`);
   });
 
-  // SPIN
   socket.on("spin", ({ roomId, spinnerId }) => {
-    console.log("🎡 Spin request:", roomId, spinnerId);
+    const safeRoomId = roomId || 1;
+    const safeSpinnerId = spinnerId || 1;
+
+    console.log("🎡 Spin request:", safeRoomId, safeSpinnerId);
 
     db.get(
       "SELECT * FROM spinners WHERE id = ?",
-      [spinnerId],
+      [safeSpinnerId],
       (err, spinner) => {
         if (err) {
-          console.log(err.message);
+          console.log("Spinner DB error:", err.message);
           return;
         }
 
@@ -87,24 +71,31 @@ io.on("connection", (socket) => {
         }
 
         const items = JSON.parse(spinner.items);
-
-        // RANDOM
         const result = items[Math.floor(Math.random() * items.length)];
 
-        // SAVE
         db.run(
           "UPDATE spinners SET lastResult = ? WHERE id = ?",
-          [result, spinnerId],
+          [result, safeSpinnerId],
           function (err) {
             if (err) {
-              console.log(err.message);
+              console.log("Update spinner error:", err.message);
               return;
             }
 
-            console.log("✅ Result:", result);
+            db.run(
+              "INSERT INTO spin_history (spinnerId, roomId, result, createdAt) VALUES (?, ?, ?, ?)",
+              [safeSpinnerId, safeRoomId, result, new Date().toISOString()],
+              (historyErr) => {
+                if (historyErr) {
+                  console.log("History error:", historyErr.message);
+                } else {
+                  console.log("📜 History saved");
+                }
+              }
+            );
 
-            // EMIT KE ROOM
-            io.to(roomId).emit("spinResult", result);
+            console.log("✅ Result:", result);
+            io.to(safeRoomId).emit("spinResult", result);
           }
         );
       }
@@ -116,9 +107,6 @@ io.on("connection", (socket) => {
   });
 });
 
-// ==========================
-// START SERVER
-// ==========================
 const PORT = 5000;
 
 server.listen(PORT, () => {

@@ -29,11 +29,12 @@ CREATE TABLE IF NOT EXISTS rooms (
 
 // SPINNERS
 db.run(`
-CREATE TABLE IF NOT EXISTS spinners (
+CREATE TABLE IF NOT EXISTS spin_history (
   id INTEGER PRIMARY KEY AUTOINCREMENT,
+  spinnerId INTEGER,
   roomId INTEGER,
-  items TEXT,
-  lastResult TEXT
+  result TEXT,
+  createdAt TEXT
 )
 `);
 
