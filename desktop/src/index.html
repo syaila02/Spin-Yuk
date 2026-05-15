@@ -25,16 +25,75 @@
     </div>
 
     <nav class="sidebar-nav">
-        <button class="sidebar-link active" data-menu="quick-spin">
-        <span>QS</span>
+    <button class="sidebar-link active" data-menu="quick-spin">
+        <span class="sidebar-icon">
+        <svg viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="9"></circle>
+            <path d="M12 3v9l6.3 6.3"></path>
+            <circle cx="12" cy="12" r="2.2"></circle>
+        </svg>
+        </span>
         Quick Spin
-        </button>
+    </button>
 
-        <button class="sidebar-link" data-menu="group-spin">
-        <span>GS</span>
+    <button class="sidebar-link" data-menu="group-spin">
+        <span class="sidebar-icon">
+        <svg viewBox="0 0 24 24">
+            <path d="M8 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"></path>
+            <path d="M16 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"></path>
+            <path d="M4 20c0-3 1.8-5 4-5s4 2 4 5"></path>
+            <path d="M12 20c0-3 1.8-5 4-5s4 2 4 5"></path>
+        </svg>
+        </span>
         Group Spin
-        </button>
+    </button>
+
+    <button class="sidebar-link" data-menu="community-spin">
+        <span class="sidebar-icon">
+        <svg viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="9"></circle>
+            <path d="M3 12h18"></path>
+            <path d="M12 3c2.5 2.7 3.8 5.7 3.8 9S14.5 18.3 12 21"></path>
+            <path d="M12 3C9.5 5.7 8.2 8.7 8.2 12S9.5 18.3 12 21"></path>
+        </svg>
+        </span>
+        Community Spin
+    </button>
+
+    <button class="sidebar-link" data-menu="about-spinyuk">
+        <span class="sidebar-icon">
+        <svg viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="9"></circle>
+            <path d="M12 10v7"></path>
+            <path d="M12 7h.01"></path>
+        </svg>
+        </span>
+        Tentang SpinYuk
+    </button>
+
+    <button class="sidebar-link" data-menu="settings">
+        <span class="sidebar-icon">
+        <svg viewBox="0 0 24 24">
+            <path d="M12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z"></path>
+            <path d="M19.4 15a1.8 1.8 0 0 0 .3 2l.1.1a2 2 0 0 1-2.8 2.8l-.1-.1a1.8 1.8 0 0 0-2-.3 1.8 1.8 0 0 0-1.1 1.6V21a2 2 0 0 1-4 0v-.1a1.8 1.8 0 0 0-1.1-1.6 1.8 1.8 0 0 0-2 .3l-.1.1a2 2 0 0 1-2.8-2.8l.1-.1a1.8 1.8 0 0 0 .3-2 1.8 1.8 0 0 0-1.6-1.1H3a2 2 0 0 1 0-4h.1a1.8 1.8 0 0 0 1.6-1.1 1.8 1.8 0 0 0-.3-2l-.1-.1a2 2 0 0 1 2.8-2.8l.1.1a1.8 1.8 0 0 0 2 .3 1.8 1.8 0 0 0 1.1-1.6V3a2 2 0 0 1 4 0v.1a1.8 1.8 0 0 0 1.1 1.6 1.8 1.8 0 0 0 2-.3l.1-.1a2 2 0 0 1 2.8 2.8l-.1.1a1.8 1.8 0 0 0-.3 2 1.8 1.8 0 0 0 1.6 1.1H21a2 2 0 0 1 0 4h-.1a1.8 1.8 0 0 0-1.5.7Z"></path>
+        </svg>
+        </span>
+        Pengaturan
+    </button>
+
+    <button class="sidebar-link" data-menu="auth">
+    <span class="sidebar-icon">
+        <svg viewBox="0 0 24 24">
+        <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
+        <path d="M10 17l5-5-5-5"></path>
+        <path d="M15 12H3"></path>
+        </svg>
+    </span>
+    Login
+    </button>
     </nav>
+
+
 
     </aside>
 
@@ -98,8 +157,8 @@
 
         <div class="hero-action-card">
             <p>Active Mode</p>
-            <h2>Quick Spin</h2>
-            <span>Gunakan sidebar untuk berpindah mode</span>
+            <h2 id="activeModeTitle">Quick Spin</h2>
+            <span id="activeModeDesc">Spinner utama untuk memilih satu hasil.</span>
         </div>
     </header>
 
@@ -112,11 +171,7 @@
           <input type="text" id="roomName" placeholder="Contoh: Pilih Tempat Makan" />
 
           <label>Nama Pengguna</label>
-          <input type="text" id="userName" placeholder="Contoh: Aam" />
-
-          <p class="hint">
-            Untuk sementara data berjalan secara lokal di desktop. Nanti bisa disambungkan ke backend temanmu.
-          </p>
+          <input type="text" id="userName" placeholder="Contoh: Ami" />
         </div>
 
         <div class="card">
@@ -250,7 +305,7 @@
 
         <label>Daftar Nama</label>
         <textarea id="groupNamesInput" placeholder="Contoh:
-    Aam
+    Ami
     Syaila
     Kibar
     Auliya"></textarea>
@@ -270,7 +325,7 @@
             </div>
 
             <div>
-            <label>Anggota per Kelompok</label>
+            <label>Jumlah Anggota</label>
             <input type="number" id="memberPerGroupInput" min="1" value="5" />
             </div>
         </div>
@@ -308,6 +363,488 @@
             <div id="groupResultContainer" class="group-result-container">
         </div>
     </div>
+    </section>
+    <section id="communitySpinPage" class="community-spin-page">
+    <div class="community-layout">
+        <div class="card community-login-card">
+        <h2>Community Spin</h2>
+        <p class="hint">
+            Mode simulasi room bersama untuk beberapa pengguna. Masukkan nama pengguna, buat room,
+            lalu tambahkan pilihan untuk diputar bersama.
+        </p>
+
+        <label>Nama Pengguna</label>
+        <input type="text" id="communityUserInput" placeholder="Contoh: Ami" />
+
+        <label>Room Code</label>
+        <input type="text" id="communityRoomInput" placeholder="Contoh: SPIN123" />
+        <label>Password Room</label>
+        <input
+            type="password"
+            id="communityPasswordInput"
+            placeholder="Masukkan password room"
+        />
+
+        <div class="community-action-row">
+            <button id="communityCreateBtn">Create Room</button>
+            <button id="communityJoinBtn" class="secondary-btn">Join Room</button>
+        </div>
+
+        <div class="community-status-box">
+            <p>Room Aktif</p>
+            <h3 id="communityRoomCodeText">Belum masuk room</h3>
+            <span id="communityUserText">Nama pengguna belum diatur.</span>
+        </div>
+
+        <button id="communityLeaveBtn" class="danger-outline-btn">Keluar Room</button>
+        </div>
+
+        <div class="card community-option-card">
+        <h2>Pilihan Community</h2>
+        <div class="community-wheel-wrapper">
+        <div class="community-pointer"></div>
+
+        <canvas
+            id="communityWheelCanvas"
+            width="380"
+            height="380"
+        ></canvas>
+        </div>
+        <p class="hint">
+            Tambahkan pilihan yang akan diputar dalam room community.
+        </p>
+
+        <div class="input-row">
+            <input type="text" id="communityOptionInput" placeholder="Masukkan pilihan community..." />
+            <button id="communityAddOptionBtn">Tambah</button>
+        </div>
+
+        <ul id="communityOptionList" class="item-list"></ul>
+
+        <button id="communitySpinBtn" class="spin-btn community-spin-btn">
+            SPIN BERSAMA
+        </button>
+
+        <div class="result-box">
+            <p>Hasil Community Spin</p>
+            <h2 id="communityResultText">Belum ada hasil</h2>
+        </div>
+        </div>
+
+        <div class="card community-room-card">
+        <h2>Room Activity</h2>
+
+        <div class="community-section">
+            <h3>Peserta</h3>
+            <div id="communityParticipantList" class="community-list">
+            <p class="empty-text">Belum ada peserta.</p>
+            </div>
+        </div>
+
+        <div class="community-section">
+            <h3>Riwayat Community</h3>
+            <div id="communityHistoryList" class="community-list">
+            <p class="empty-text">Belum ada riwayat community.</p>
+            </div>
+        </div>
+        </div>
+    </div>
+    </section>
+    <section id="aboutPage" class="about-page">
+    <div class="about-layout">
+        <div class="card about-intro-card">
+        <p class="about-label">TENTANG APLIKASI</p>
+        <h2>SpinYuk Desktop</h2>
+        <p>
+            SpinYuk Desktop adalah aplikasi spinner interaktif berbasis desktop yang dirancang
+            untuk membantu pengguna memilih keputusan secara cepat, membagi kelompok secara acak,
+            serta menjalankan simulasi spin bersama melalui mode Community Spin.
+        </p>
+        <div class="about-tech-list">
+            <span>Electron</span>
+            <span>HTML</span>
+            <span>CSS</span>
+            <span>JavaScript</span>
+            <span>Local Storage</span>
+        </div>
+
+        <div class="about-info-grid">
+            <div class="about-info-item">
+                <strong>Mata Kuliah</strong>
+                <span>Pengembangan Aplikasi Berbasis Platform</span>
+            </div>
+
+            <div class="about-info-item">
+                <strong>Platform</strong>
+                <span>Desktop Application</span>
+            </div>
+
+            <div class="about-info-item">
+                <strong>Mode Aplikasi</strong>
+                <span>Quick, Group, dan Community Spin</span>
+            </div>
+
+            <div class="about-info-item">
+                <strong>Tujuan</strong>
+                <span>Membantu pengambilan keputusan secara acak dan interaktif</span>
+            </div>
+        </div>
+        </div>
+
+        <div class="card about-project-card">
+        <h2>Fitur Utama</h2>
+
+        <div class="about-feature-list">
+            <div>
+                <strong>Quick Spin</strong>
+                <p>Mode spinner utama untuk memilih satu hasil dari daftar pilihan.</p>
+            </div>
+
+            <div>
+                <strong>Group Spin</strong>
+                <p>Mode pembagian nama ke dalam beberapa kelompok secara bertahap.</p>
+            </div>
+
+            <div>
+                <strong>Community Spin</strong>
+                <p>Mode simulasi room bersama dengan room code dan password sederhana.</p>
+            </div>
+
+            <div>
+                <strong>Desktop Feature</strong>
+                <p>Mendukung system tray, shortcut, import file, export, drag and drop, dan focus mode.</p>
+            </div>
+        </div>
+        </div>
+
+        <div class="card tutorial-card">
+            <div class="tutorial-header">
+                <p class="about-label">HOW TO USE</p>
+                <h2>Panduan Penggunaan SpinYuk</h2>
+                <span>Ikuti alur berikut untuk menggunakan fitur utama aplikasi.</span>
+            </div>
+
+            <div class="tutorial-steps">
+                <div class="tutorial-step">
+                <div class="tutorial-icon">
+                    <svg viewBox="0 0 24 24">
+                    <path d="M12 3a9 9 0 1 0 9 9"></path>
+                    <path d="M12 3v9l6 6"></path>
+                    <circle cx="12" cy="12" r="2"></circle>
+                    </svg>
+                </div>
+                <h3>Pilih Mode</h3>
+                <p>Pilih Quick Spin, Group Spin, atau Community Spin melalui sidebar.</p>
+                </div>
+
+                <div class="tutorial-step">
+                <div class="tutorial-icon">
+                    <svg viewBox="0 0 24 24">
+                    <path d="M12 5v14"></path>
+                    <path d="M5 12h14"></path>
+                    <rect x="4" y="4" width="16" height="16" rx="4"></rect>
+                    </svg>
+                </div>
+                <h3>Masukkan Data</h3>
+                <p>Tambahkan pilihan, daftar nama, atau room code sesuai mode yang digunakan.</p>
+                </div>
+
+                <div class="tutorial-step">
+                <div class="tutorial-icon">
+                    <svg viewBox="0 0 24 24">
+                    <path d="M4 12a8 8 0 1 1 8 8"></path>
+                    <path d="M4 12h5"></path>
+                    <path d="M9 7v10"></path>
+                    </svg>
+                </div>
+                <h3>Mulai Spin</h3>
+                <p>Klik tombol spin untuk memutar roda dan menentukan hasil secara acak.</p>
+                </div>
+
+                <div class="tutorial-step">
+                <div class="tutorial-icon">
+                    <svg viewBox="0 0 24 24">
+                    <path d="M5 13l4 4L19 7"></path>
+                    <circle cx="12" cy="12" r="9"></circle>
+                    </svg>
+                </div>
+                <h3>Lihat Hasil</h3>
+                <p>Hasil spin akan muncul pada card hasil dan tersimpan ke riwayat.</p>
+                </div>
+
+                <div class="tutorial-step">
+                <div class="tutorial-icon">
+                    <svg viewBox="0 0 24 24">
+                    <path d="M12 3v12"></path>
+                    <path d="M7 10l5 5 5-5"></path>
+                    <path d="M5 21h14"></path>
+                    </svg>
+                </div>
+                <h3>Export Data</h3>
+                <p>Simpan riwayat atau hasil kelompok ke file lokal sebagai dokumentasi.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="card team-card">
+        
+         <div class="team-header team-header-enhanced">
+        <div class="team-header-left">
+        <p class="about-label">TEAM PROFILE</p>
+
+        <h2 class="team-main-title">
+            Anggota Kelompok Pengembang
+        </h2>
+
+        <p class="team-subtitle">
+            Project desktop application berbasis Electron untuk kebutuhan spin interaktif dan collaborative decision making.
+        </p>
+
+        <div class="team-academic-info">
+            <span>Desktop Application</span>
+            <span>2026</span>
+        </div>
+        </div>
+
+        <div class="team-logo-showcase">
+            <div class="team-logo-glow team-logo-glow-1"></div>
+            <div class="team-logo-glow team-logo-glow-2"></div>
+
+            <div class="team-logo-card if-logo-card">
+            <img src="if-logo.png" alt="Logo Informatika" />
+            <div class="team-logo-text">
+                <strong>Program Studi</strong>
+                <span>Informatika</span>
+            </div>
+            </div>
+
+            <div class="team-logo-card unsil-logo-card">
+            <img src="unsil-logo.png" alt="Logo Universitas Siliwangi" />
+            <div class="team-logo-text">
+                <strong>Identitas Kampus</strong>
+                <span>Universitas Siliwangi</span>
+            </div>
+            </div>
+        </div>
+        </div>   
+
+        <div class="team-grid">
+                <div class="member-card">
+                <img src="amii.jpeg" alt="Foto Ami" />
+                <h3>Aam Aminah</h3>
+                <p>NPM: 247006111205</p>
+                <span class="member-role">Desktop Developer</span>
+            </div>
+
+            <div class="member-card">
+                <img src="syaila.jpeg" alt="Foto Syaila" />
+                <h3>Syaila Zahwa</h3>
+                <p>NPM: 247006111180</p>
+                <span class="member-role">Fullstack/ integration</span>
+            </div>
+
+            <div class="member-card">
+                <img src="kibar.jpeg" alt="Foto Kibar" />
+                <h3>Muhammad Kibar Ramadhan</h3>
+                <p>NPM: 247006111191</p>
+                <span class="member-role">Frontend Web</span>
+            </div>
+
+            <div class="member-card">
+                <img src="aul.jpeg" alt="Foto Anggota 4" />
+                <h3>Auliya Nadya Putri Taufik</h3>
+                <p>NPM: 247006111200</p>
+                <span class="member-role">Backend Developer</span>
+            </div>
+        </div>
+        </div>
+    </div>
+    </section>
+    <section id="settingsPage" class="settings-page">
+        <div class="settings-header-card card">
+            <p class="about-label">APPLICATION SETTINGS</p>
+            <h2>Pengaturan SpinYuk</h2>
+            <p class="hint">
+            Kelola preferensi aplikasi desktop, mulai dari bahasa, audio, mode spin, hingga data lokal.
+            </p>
+        </div>
+
+        <div class="settings-layout advanced-settings-layout">
+            <div class="card settings-panel-card profile-settings-card">
+                <p class="about-label">ACCOUNT PROFILE</p>
+                <h2>Profil Akun</h2>
+
+                <div class="profile-preview-box">
+                    <div class="profile-avatar-wrapper">
+                    <img id="profilePreviewImage" class="profile-preview-image" alt="Foto Profil" />
+                    <div id="profileInitialText" class="profile-initial-text">G</div>
+                    </div>
+
+                    <div class="profile-preview-info">
+                    <strong id="profilePreviewName">Guest User</strong>
+                    <span id="profilePreviewEmail">Belum login</span>
+                    <small id="profileLoginStatus">Status: Guest</small>
+                    </div>
+                </div>
+
+                <input type="file" id="profilePhotoInput" accept="image/*" hidden />
+
+                <div class="profile-action-row">
+                    <button id="chooseProfilePhotoBtn" class="secondary-btn">Pilih Foto Profil</button>
+                    <button id="removeProfilePhotoBtn" class="danger-btn">Hapus Foto</button>
+                </div>
+
+                <label>Nama Profil</label>
+                <input type="text" id="profileNameInput" placeholder="Contoh: Ami" />
+
+                <label>Email Profil</label>
+                <input type="email" id="profileEmailInput" placeholder="Contoh: username@gmail.com" />
+
+                <button id="saveProfileBtn" class="spin-btn profile-save-btn">Simpan Profil</button>
+            </div>
+
+            <div class="card settings-panel-card">
+            <h2>Preferensi Umum</h2>
+
+            <label>Bahasa Aplikasi</label>
+            <select id="settingLanguage" class="settings-select">
+                <option value="id">Indonesia</option>
+                <option value="en">English</option>
+            </select>
+
+            <label>Default Nama Pengguna</label>
+            <input type="text" id="settingDefaultUser" placeholder="Contoh: Ami" />
+
+            <label>Default Nama Room</label>
+            <input type="text" id="settingDefaultRoom" placeholder="Contoh: Pilih Tempat Makan" />
+
+
+            <button id="saveSettingsBtn" class="spin-btn">Simpan Pengaturan</button>
+            </div>
+
+            <div class="card settings-panel-card">
+            <h2>Audio</h2>
+
+            <label class="setting-toggle-card">
+                <input type="checkbox" id="settingSoundEffect" />
+                <div>
+                <strong>Efek Suara Spin</strong>
+                <span>Memutar efek suara pendek ketika hasil spin muncul.</span>
+                </div>
+            </label>
+            <label class="setting-toggle-card">
+            <input type="checkbox" id="settingErrorSound" />
+            <div>
+                <strong>Efek Suara Error</strong>
+                <span>Memutar efek suara ketika input kosong, pilihan kurang, atau aksi gagal.</span>
+            </div>
+            </label>
+
+            <label class="setting-toggle-card">
+            <input type="checkbox" id="settingButtonSound" />
+            <div>
+                <strong>Suara Tombol</strong>
+                <span>Memutar suara klik pendek setiap tombol aplikasi ditekan.</span>
+            </div>
+            </label>
+
+            <label class="setting-toggle-card">
+                <input type="checkbox" id="settingBackgroundMusic" />
+                <div>
+                <strong>Musik Latar</strong>
+                <span>Memutar musik latar saat aplikasi digunakan.</span>
+                </div>
+            </label>
+
+            <label>Volume Musik</label>
+            <input type="range" id="settingMusicVolume" min="0" max="100" value="35" class="volume-slider" />
+
+            <div class="volume-info">
+                <span>Volume</span>
+                <strong id="volumeValueText">35%</strong>
+            </div>
+            </div>
+
+            <div class="card settings-panel-card danger-settings-card">
+            <h2>Data Lokal</h2>
+
+            <p class="hint">
+                Menghapus pilihan, riwayat, room, nama pengguna, dan pengaturan yang tersimpan di perangkat ini.
+            </p>
+
+            <button id="resetAllLocalBtn" class="danger-outline-btn">Reset Data Aplikasi</button>
+            </div>
+        </div>
+
+        <audio id="backgroundMusic" src="background-music.mp3" loop></audio>
+        <audio id="successSound" src="success-sound.mp3"></audio>
+        <audio id="errorSound" src="error-sound.mp3"></audio>
+    </section>
+
+    <section id="authPage" class="auth-page">
+        <div class="auth-layout">
+            <div class="card auth-card">
+            <p class="about-label">USER AUTHENTICATION</p>
+            <h2>Masuk ke SpinYuk</h2>
+            <p class="hint">
+                Login digunakan untuk mengakses fitur Community Spin. Untuk sementara autentikasi berjalan lokal,
+                dan nantinya dapat disambungkan ke backend bersama.
+            </p>
+
+            <div class="auth-tabs">
+                <button id="loginTabBtn" class="auth-tab active">Login</button>
+                <button id="registerTabBtn" class="auth-tab">Register</button>
+            </div>
+
+            <div id="loginForm" class="auth-form">
+                <label>Email / Username</label>
+                <input type="text" id="loginIdentifierInput" placeholder="Contoh: username@gmail.com" />
+
+                <label>Password</label>
+                <input type="password" id="loginPasswordInput" placeholder="Masukkan password" />
+
+                <button id="loginBtn" class="spin-btn auth-main-btn">Login</button>
+            </div>
+
+            <div id="registerForm" class="auth-form hidden">
+                <label>Nama Pengguna</label>
+                <input type="text" id="registerNameInput" placeholder="Contoh: Ami" />
+
+                <label>Email</label>
+                <input type="email" id="registerEmailInput" placeholder="Contoh: username@gmail.com" />
+
+                <label>Password</label>
+                <input type="password" id="registerPasswordInput" placeholder="Minimal 6 karakter" />
+
+                <button id="registerBtn" class="spin-btn auth-main-btn">Register</button>
+            </div>
+            </div>
+
+            <div class="card auth-status-card">
+            <p class="about-label">ACCOUNT STATUS</p>
+            <h2>Status Pengguna</h2>
+
+            <div class="auth-user-box">
+                <p id="authStatusText">Belum login</p>
+                <h3 id="authUserNameText">Guest User</h3>
+                <span id="authUserEmailText">Login untuk menggunakan fitur Community Spin.</span>
+            </div>
+
+            <div class="settings-info-list">
+                <div>
+                <strong>Akses Community Spin</strong>
+                <span>Login diperlukan untuk membuat room, join room, menambah pilihan, dan melakukan spin bersama.</span>
+                </div>
+
+                <div>
+                <strong>Siap Terhubung Backend</strong>
+                <span>Form login dan register ini disiapkan agar mudah disambungkan ke API backend.</span>
+                </div>
+            </div>
+
+            <button id="logoutBtn" class="danger-outline-btn">Logout</button>
+            </div>
+        </div>
     </section>
   </div>
 

@@ -29,6 +29,8 @@ const sidebarClose = document.getElementById("sidebarClose");
 const appSidebar = document.getElementById("appSidebar");
 const sidebarOverlay = document.getElementById("sidebarOverlay");
 const sidebarLinks = document.querySelectorAll(".sidebar-link");
+const activeModeTitle = document.getElementById("activeModeTitle");
+const activeModeDesc = document.getElementById("activeModeDesc");
 const quickSpinPage = document.querySelector(".main-layout");
 const groupSpinPage = document.getElementById("groupSpinPage");
 
@@ -54,6 +56,82 @@ const groupDropZone = document.getElementById("groupDropZone");
 const groupResetConfirmCard = document.getElementById("groupResetConfirmCard");
 const groupResetYesBtn = document.getElementById("groupResetYesBtn");
 const groupResetCancelBtn = document.getElementById("groupResetCancelBtn");
+
+const communitySpinPage = document.getElementById("communitySpinPage");
+
+const communityUserInput = document.getElementById("communityUserInput");
+const communityRoomInput = document.getElementById("communityRoomInput");
+const communityCreateBtn = document.getElementById("communityCreateBtn");
+const communityJoinBtn = document.getElementById("communityJoinBtn");
+const communityLeaveBtn = document.getElementById("communityLeaveBtn");
+const communityRoomCodeText = document.getElementById("communityRoomCodeText");
+const communityUserText = document.getElementById("communityUserText");
+
+const communityOptionInput = document.getElementById("communityOptionInput");
+const communityAddOptionBtn = document.getElementById("communityAddOptionBtn");
+const communityOptionList = document.getElementById("communityOptionList");
+const communitySpinBtn = document.getElementById("communitySpinBtn");
+const communityResultText = document.getElementById("communityResultText");
+
+const communityParticipantList = document.getElementById("communityParticipantList");
+const communityHistoryList = document.getElementById("communityHistoryList");
+const communityWheelCanvas = document.getElementById("communityWheelCanvas");
+const communityCtx = communityWheelCanvas.getContext("2d");
+const communityPasswordInput = document.getElementById("communityPasswordInput");
+const aboutPage = document.getElementById("aboutPage");
+
+const settingsPage = document.getElementById("settingsPage");
+
+const settingLanguage = document.getElementById("settingLanguage");
+const settingDefaultUser = document.getElementById("settingDefaultUser");
+const settingDefaultRoom = document.getElementById("settingDefaultRoom");
+const settingRemoveWinner = document.getElementById("settingRemoveWinner");
+const settingSoundEffect = document.getElementById("settingSoundEffect");
+const settingBackgroundMusic = document.getElementById("settingBackgroundMusic");
+const settingMusicVolume = document.getElementById("settingMusicVolume");
+const volumeValueText = document.getElementById("volumeValueText");
+const backgroundMusic = document.getElementById("backgroundMusic");
+const settingErrorSound = document.getElementById("settingErrorSound");
+const successSound = document.getElementById("successSound");
+const errorSound = document.getElementById("errorSound");
+const settingButtonSound = document.getElementById("settingButtonSound");
+const profilePreviewImage = document.getElementById("profilePreviewImage");
+const profileInitialText = document.getElementById("profileInitialText");
+const profilePreviewName = document.getElementById("profilePreviewName");
+const profilePreviewEmail = document.getElementById("profilePreviewEmail");
+const profileLoginStatus = document.getElementById("profileLoginStatus");
+
+const profilePhotoInput = document.getElementById("profilePhotoInput");
+const chooseProfilePhotoBtn = document.getElementById("chooseProfilePhotoBtn");
+const removeProfilePhotoBtn = document.getElementById("removeProfilePhotoBtn");
+
+const profileNameInput = document.getElementById("profileNameInput");
+const profileEmailInput = document.getElementById("profileEmailInput");
+const saveProfileBtn = document.getElementById("saveProfileBtn");
+
+const saveSettingsBtn = document.getElementById("saveSettingsBtn");
+const resetAllLocalBtn = document.getElementById("resetAllLocalBtn");
+
+const authPage = document.getElementById("authPage");
+
+const loginTabBtn = document.getElementById("loginTabBtn");
+const registerTabBtn = document.getElementById("registerTabBtn");
+const loginForm = document.getElementById("loginForm");
+const registerForm = document.getElementById("registerForm");
+
+const loginIdentifierInput = document.getElementById("loginIdentifierInput");
+const loginPasswordInput = document.getElementById("loginPasswordInput");
+const loginBtn = document.getElementById("loginBtn");
+
+const registerNameInput = document.getElementById("registerNameInput");
+const registerEmailInput = document.getElementById("registerEmailInput");
+const registerPasswordInput = document.getElementById("registerPasswordInput");
+const registerBtn = document.getElementById("registerBtn");
+
+const authStatusText = document.getElementById("authStatusText");
+const authUserNameText = document.getElementById("authUserNameText");
+const authUserEmailText = document.getElementById("authUserEmailText");
+const logoutBtn = document.getElementById("logoutBtn");
 
 const colors = [
   "#7c3aed",
@@ -84,12 +162,38 @@ let groupCount = 0;
 let memberPerGroup = 0;
 let groupRotation = 0;
 let isGroupSpinning = false;
+let communityRoom = {
+  code: "",
+  user: "",
+  participants: [],
+  options: [],
+  history: []
+};
+let communityRotation = 0;
+let authUser = null;
 
 function showToast(title, message) {
   if (!toastCard || !toastTitle || !toastMessage) return;
 
   toastTitle.textContent = title;
   toastMessage.textContent = message;
+  const errorKeywords = [
+  "Gagal",
+  "Kosong",
+  "Kurang",
+  "Salah",
+  "Duplikat",
+  "Belum",
+  "Dibatalkan"
+];
+
+const isErrorToast = errorKeywords.some((keyword) =>
+  title.toLowerCase().includes(keyword.toLowerCase())
+);
+
+if (isErrorToast) {
+  playErrorSound();
+}
 
   toastCard.classList.remove("closing");
   toastCard.classList.add("show");
@@ -388,6 +492,7 @@ function spinWheel() {
 
     resultText.textContent = winner;
     showToast("Hasil Spin", winner);
+    playSuccessSound();
 
     history.unshift({
       result: winner,
@@ -723,6 +828,7 @@ function spinGroupName() {
     groupResultText.textContent = winner;
 
     showToast("Hasil Group Spin", `${winner} masuk Kelompok ${targetGroupIndex + 1}`);
+    playSuccessSound();
 
     drawGroupWheel();
     renderGroupResults();
@@ -892,6 +998,1027 @@ function toggleFocusMode() {
   }
 }
 
+function generateRoomCode() {
+  const randomNumber = Math.floor(100 + Math.random() * 900);
+  return `SPIN${randomNumber}`;
+}
+
+function isCommunityJoined() {
+  return communityRoom.code && communityRoom.user;
+}
+
+function renderCommunityRoom() {
+  if (!communityRoomCodeText || !communityUserText) return;
+
+  communityRoomCodeText.textContent = communityRoom.code || "Belum masuk room";
+  communityUserText.textContent = communityRoom.user
+    ? `Masuk sebagai ${communityRoom.user}`
+    : "Nama pengguna belum diatur.";
+
+  communityOptionList.innerHTML = "";
+
+  if (communityRoom.options.length === 0) {
+    communityOptionList.innerHTML = `<p class="empty-text">Belum ada pilihan community.</p>`;
+  } else {
+    communityRoom.options.forEach((option, index) => {
+      const li = document.createElement("li");
+
+      const span = document.createElement("span");
+      span.textContent = option;
+
+      const removeBtn = document.createElement("button");
+      removeBtn.textContent = "Hapus";
+      removeBtn.className = "remove-item";
+      removeBtn.addEventListener("click", () => {
+        communityRoom.options.splice(index, 1);
+        renderCommunityRoom();
+        drawCommunityWheel();
+      });
+
+      li.appendChild(span);
+      li.appendChild(removeBtn);
+      communityOptionList.appendChild(li);
+    });
+  }
+
+  communityParticipantList.innerHTML = "";
+
+  if (communityRoom.participants.length === 0) {
+    communityParticipantList.innerHTML = `<p class="empty-text">Belum ada peserta.</p>`;
+  } else {
+    communityRoom.participants.forEach((participant) => {
+      const div = document.createElement("div");
+      div.className = "community-list-item";
+      div.textContent = participant;
+      communityParticipantList.appendChild(div);
+    });
+  }
+
+  communityHistoryList.innerHTML = "";
+
+  if (communityRoom.history.length === 0) {
+    communityHistoryList.innerHTML = `<p class="empty-text">Belum ada riwayat community.</p>`;
+  } else {
+    communityRoom.history.forEach((item) => {
+      const div = document.createElement("div");
+      div.className = "community-list-item";
+
+      div.innerHTML = `
+        <strong>${item.result}</strong>
+        <span>${item.room} • ${item.user} • ${item.time}</span>
+      `;
+
+      communityHistoryList.appendChild(div);
+    });
+  }
+}
+
+function drawCommunityWheel() {
+  if (!communityWheelCanvas) return;
+
+  const centerX = communityWheelCanvas.width / 2;
+  const centerY = communityWheelCanvas.height / 2;
+  const radius = 180;
+
+  communityCtx.clearRect(
+    0,
+    0,
+    communityWheelCanvas.width,
+    communityWheelCanvas.height
+  );
+  if (communityRoom.options.length === 0) {
+    communityCtx.beginPath();
+    communityCtx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+    communityCtx.fillStyle = "#1e1b4b";
+    communityCtx.fill();
+
+    communityCtx.fillStyle = "#e9d5ff";
+    communityCtx.font = "bold 16px Arial";
+    communityCtx.textAlign = "center";
+    communityCtx.fillText(
+      "Tambahkan pilihan dulu",
+      centerX,
+      centerY
+    );
+
+    return;
+  }
+
+  const anglePerItem = (Math.PI * 2) / communityRoom.options.length;
+
+  communityRoom.options.forEach((item, index) => {
+    const startAngle = index * anglePerItem;
+    const endAngle = startAngle + anglePerItem;
+
+    communityCtx.beginPath();
+    communityCtx.moveTo(centerX, centerY);
+    communityCtx.arc(centerX, centerY, radius, startAngle, endAngle);
+    communityCtx.closePath();
+    communityCtx.fillStyle = colors[index % colors.length];
+    communityCtx.fill();
+
+    communityCtx.strokeStyle = "rgba(255,255,255,0.55)";
+    communityCtx.lineWidth = 3;
+    communityCtx.stroke();
+
+    communityCtx.save();
+
+    communityCtx.translate(centerX, centerY);
+    communityCtx.rotate(startAngle + anglePerItem / 2);
+
+    communityCtx.fillStyle = "white";
+    communityCtx.font = "bold 14px Arial";
+    communityCtx.textAlign = "right";
+    communityCtx.textBaseline = "middle";
+
+    const shortText =
+      item.length > 16 ? item.slice(0, 16) + "..." : item;
+
+    communityCtx.fillText(shortText, radius - 18, 0);
+
+    communityCtx.restore();
+  });
+
+   communityCtx.beginPath();
+  communityCtx.arc(centerX, centerY, 42, 0, Math.PI * 2);
+  communityCtx.fillStyle = "#0f172a";
+  communityCtx.fill();
+
+  communityCtx.strokeStyle = "white";
+  communityCtx.lineWidth = 4;
+  communityCtx.stroke();
+
+  communityCtx.fillStyle = "#c084fc";
+  communityCtx.font = "bold 15px Arial";
+  communityCtx.textAlign = "center";
+  communityCtx.textBaseline = "middle";
+  communityCtx.fillText("SPIN", centerX, centerY);
+}
+
+function createCommunityRoom() {
+  if (!requireCommunityLogin()) return;
+  const user = communityUserInput.value.trim();
+
+  if (!user) {
+    showToast("Nama Kosong", "Masukkan nama pengguna terlebih dahulu");
+    communityUserInput.focus();
+    return;
+  }
+
+  const roomCode = generateRoomCode();
+
+  communityRoom = {
+    code: roomCode,
+    password: communityPasswordInput.value.trim(),
+    user,
+    participants: [user],
+    options: [],
+    history: []
+  };
+
+  communityRoomInput.value = roomCode;
+  communityResultText.textContent = "Belum ada hasil";
+
+  renderCommunityRoom();
+
+  showToast("Room Dibuat", `Kode room: ${roomCode}`);
+}
+
+function joinCommunityRoom() {
+  if (!requireCommunityLogin()) return;
+  const user = communityUserInput.value.trim();
+  const roomCode = communityRoomInput.value.trim().toUpperCase();
+  const password = communityPasswordInput.value.trim();
+
+  if (!user) {
+    showToast("Nama Kosong", "Masukkan nama pengguna terlebih dahulu");
+    communityUserInput.focus();
+    return;
+  }
+
+  if (!roomCode) {
+    showToast("Room Kosong", "Masukkan room code terlebih dahulu");
+    communityRoomInput.focus();
+    return;
+  }
+  if (!password) {
+    showToast("Password Kosong", "Masukkan password room terlebih dahulu");
+    return;
+  }
+
+  communityRoom = {
+    code: roomCode,
+    user,
+    participants: [user, "Syaila", "Kibar"],
+    options: [],
+    history: []
+  };
+
+  communityResultText.textContent = "Belum ada hasil";
+
+  renderCommunityRoom();
+
+  showToast("Berhasil Join", `Masuk ke room ${roomCode}`);
+}
+
+function addCommunityOption() {
+  if (!requireCommunityLogin()) return;
+
+  if (!isCommunityJoined()) {
+    showToast("Belum Masuk Room", "Create atau join room terlebih dahulu");
+    return;
+  }
+
+  const option = communityOptionInput.value.trim();
+
+  if (!option) {
+    showToast("Input Kosong", "Masukkan pilihan community terlebih dahulu");
+    communityOptionInput.focus();
+    return;
+  }
+
+  const duplicate = communityRoom.options.some(
+    (item) => item.toLowerCase() === option.toLowerCase()
+  );
+
+  if (duplicate) {
+    showToast("Pilihan Duplikat", "Pilihan tersebut sudah ada");
+    communityOptionInput.focus();
+    return;
+  }
+
+  communityRoom.options.push(option);
+  communityOptionInput.value = "";
+
+  renderCommunityRoom();
+  drawCommunityWheel();
+}
+
+function spinCommunityOption() {
+  if (!requireCommunityLogin()) return;
+
+  if (!isCommunityJoined()) {
+    showToast("Belum Masuk Room", "Create atau join room terlebih dahulu");
+    return;
+  }
+
+  if (communityRoom.options.length < 2) {
+    showToast("Pilihan Kurang", "Minimal masukkan 2 pilihan community");
+    return;
+  }
+
+  if (isGroupSpinning) return;
+
+  isGroupSpinning = true;
+  communitySpinBtn.disabled = true;
+  communityResultText.textContent = "Sedang memutar...";
+
+  const winnerIndex = Math.floor(Math.random() * communityRoom.options.length);
+  const anglePerItem = 360 / communityRoom.options.length;
+
+  const targetAngle = 270 - (winnerIndex * anglePerItem + anglePerItem / 2);
+  const extraRotation = 360 * 6;
+
+  communityRotation +=
+    extraRotation +
+    targetAngle -
+    (communityRotation % 360);
+
+  communityWheelCanvas.style.transform = `rotate(${communityRotation}deg)`;
+
+  setTimeout(() => {
+    const winner = communityRoom.options[winnerIndex];
+
+    const time = new Date().toLocaleString("id-ID", {
+      dateStyle: "medium",
+      timeStyle: "short"
+    });
+
+    communityResultText.textContent = winner;
+
+    communityRoom.history.unshift({
+      result: winner,
+      room: communityRoom.code,
+      user: communityRoom.user,
+      time
+    });
+
+    renderCommunityRoom();
+    drawCommunityWheel();
+
+    showToast("Hasil Community Spin", winner);
+    playSuccessSound();
+
+    communitySpinBtn.disabled = false;
+    isGroupSpinning = false;
+  }, 4200);
+}
+
+function leaveCommunityRoom() {
+  if (!requireCommunityLogin()) return;
+  communityRoom = {
+    code: "",
+    user: "",
+    participants: [],
+    options: [],
+    history: []
+  };
+
+  communityUserInput.value = "";
+  communityRoomInput.value = "";
+  communityOptionInput.value = "";
+  communityResultText.textContent = "Belum ada hasil";
+
+  renderCommunityRoom();
+  drawCommunityWheel();
+
+  showToast("Keluar Room", "Community room berhasil dikosongkan");
+}
+
+function loadSettingsForm() {
+  if (settingDefaultUser) {
+    settingDefaultUser.value = localStorage.getItem("spinyuk_user") || "";
+  }
+
+  if (settingDefaultRoom) {
+    settingDefaultRoom.value = localStorage.getItem("spinyuk_room") || "";
+  }
+
+  if (settingRemoveWinner) {
+    settingRemoveWinner.checked =
+      localStorage.getItem("spinyuk_remove_winner") === "true";
+  }
+
+  if (settingLanguage) {
+    settingLanguage.value = localStorage.getItem("spinyuk_language") || "id";
+  }
+
+  if (settingSoundEffect) {
+    settingSoundEffect.checked =
+      localStorage.getItem("spinyuk_sound_effect") !== "false";
+  }
+
+  if (settingBackgroundMusic) {
+    settingBackgroundMusic.checked =
+      localStorage.getItem("spinyuk_background_music") === "true";
+  }
+
+  if (settingMusicVolume) {
+    const savedVolume = localStorage.getItem("spinyuk_music_volume") || "35";
+    settingMusicVolume.value = savedVolume;
+
+    if (volumeValueText) {
+      volumeValueText.textContent = `${savedVolume}%`;
+    }
+
+    if (backgroundMusic) {
+      backgroundMusic.volume = Number(savedVolume) / 100;
+    }
+  }
+  if (settingErrorSound) {
+    settingErrorSound.checked =
+      localStorage.getItem("spinyuk_error_sound") !== "false";
+  }
+  if (settingButtonSound) {
+    settingButtonSound.checked =
+      localStorage.getItem("spinyuk_button_sound") !== "false";
+  }
+}
+
+function saveSettingsForm() {
+  const defaultUser = settingDefaultUser.value.trim();
+  const defaultRoom = settingDefaultRoom.value.trim();
+
+  localStorage.setItem("spinyuk_user", defaultUser);
+  localStorage.setItem("spinyuk_room", defaultRoom);
+
+  if (settingLanguage) {
+    localStorage.setItem("spinyuk_language", settingLanguage.value);
+  }
+
+  if (settingRemoveWinner) {
+    localStorage.setItem(
+      "spinyuk_remove_winner",
+      settingRemoveWinner.checked ? "true" : "false"
+    );
+  }
+
+  if (settingSoundEffect) {
+    localStorage.setItem(
+      "spinyuk_sound_effect",
+      settingSoundEffect.checked ? "true" : "false"
+    );
+  }
+
+  if (settingBackgroundMusic) {
+    localStorage.setItem(
+      "spinyuk_background_music",
+      settingBackgroundMusic.checked ? "true" : "false"
+    );
+  }
+
+  if (settingMusicVolume) {
+    localStorage.setItem("spinyuk_music_volume", settingMusicVolume.value);
+  }
+
+  roomName.value = defaultRoom;
+  userName.value = defaultUser;
+
+  if (removeWinnerToggle && settingRemoveWinner) {
+    removeWinnerToggle.checked = settingRemoveWinner.checked;
+  }
+
+  if (backgroundMusic && settingBackgroundMusic) {
+    backgroundMusic.volume = Number(settingMusicVolume.value) / 100;
+
+    if (settingBackgroundMusic.checked) {
+      backgroundMusic.play().catch(() => {
+        showToast("Musik Belum Aktif", "Klik tombol simpan sekali lagi untuk memulai musik");
+      });
+    } else {
+      backgroundMusic.pause();
+    }
+  }
+  if (settingErrorSound) {
+    localStorage.setItem(
+      "spinyuk_error_sound",
+      settingErrorSound.checked ? "true" : "false"
+    );
+  }
+  if (settingButtonSound) {
+    localStorage.setItem(
+      "spinyuk_button_sound",
+      settingButtonSound.checked ? "true" : "false"
+    );
+  }
+
+  saveLocalData();
+  updateQuickStats();
+
+  showToast("Pengaturan Disimpan", "Preferensi aplikasi berhasil diperbarui");
+}
+
+function applyBackgroundMusicSetting() {
+  if (!backgroundMusic || !settingBackgroundMusic || !settingMusicVolume) return;
+
+  backgroundMusic.volume = Number(settingMusicVolume.value) / 100;
+
+  if (settingBackgroundMusic.checked) {
+    backgroundMusic.play().catch(() => {
+      showToast("Musik Belum Aktif", "Klik Simpan Pengaturan sekali lagi untuk memulai musik");
+    });
+  } else {
+    backgroundMusic.pause();
+  }
+}
+
+function resetAllLocalData() {
+  closeToast();
+
+  items = [];
+  history = [];
+  currentRotation = 0;
+  isSpinning = false;
+
+  roomName.value = "";
+  userName.value = "";
+  itemInput.value = "";
+  resultText.textContent = "Belum ada hasil";
+
+  if (removeWinnerToggle) {
+    removeWinnerToggle.checked = false;
+  }
+
+  if (settingDefaultUser) {
+    settingDefaultUser.value = "";
+  }
+
+  if (settingDefaultRoom) {
+    settingDefaultRoom.value = "";
+  }
+
+  if (settingRemoveWinner) {
+    settingRemoveWinner.checked = false;
+  }
+
+  if (settingLanguage) {
+    settingLanguage.value = "id";
+  }
+
+  if (settingSoundEffect) {
+    settingSoundEffect.checked = true;
+  }
+
+  if (settingErrorSound) {
+    settingErrorSound.checked = true;
+  }
+
+  if (settingBackgroundMusic) {
+    settingBackgroundMusic.checked = false;
+  }
+
+  if (settingMusicVolume) {
+    settingMusicVolume.value = 35;
+  }
+
+  if (volumeValueText) {
+    volumeValueText.textContent = "35%";
+  }
+
+  if (backgroundMusic) {
+    backgroundMusic.pause();
+    backgroundMusic.currentTime = 0;
+    backgroundMusic.volume = 0.35;
+  }
+
+  if (settingButtonSound) {
+    settingButtonSound.checked = true;
+  }
+
+  localStorage.removeItem("spinyuk_items");
+  localStorage.removeItem("spinyuk_history");
+  localStorage.removeItem("spinyuk_room");
+  localStorage.removeItem("spinyuk_user");
+  localStorage.removeItem("spinyuk_remove_winner");
+  localStorage.removeItem("spinyuk_language");
+  localStorage.removeItem("spinyuk_sound_effect");
+  localStorage.removeItem("spinyuk_error_sound");
+  localStorage.removeItem("spinyuk_background_music");
+  localStorage.removeItem("spinyuk_music_volume");
+  localStorage.removeItem("spinyuk_button_sound");
+  localStorage.removeItem("spinyuk_profile_name");
+  localStorage.removeItem("spinyuk_profile_email");
+  localStorage.removeItem("spinyuk_profile_photo");
+
+  groupNames = [];
+  groupResults = [];
+  groupCount = 0;
+  memberPerGroup = 0;
+  groupRotation = 0;
+  isGroupSpinning = false;
+
+  if (groupNamesInput) groupNamesInput.value = "";
+  if (groupCountInput) groupCountInput.value = 6;
+  if (memberPerGroupInput) memberPerGroupInput.value = 5;
+  if (groupResultText) groupResultText.textContent = "Belum ada hasil";
+  if (groupProgressText) groupProgressText.textContent = "Belum ada data kelompok.";
+
+  communityRoom = {
+    code: "",
+    user: "",
+    participants: [],
+    options: [],
+    history: []
+  };
+
+  if (communityUserInput) communityUserInput.value = "";
+  if (communityRoomInput) communityRoomInput.value = "";
+  if (communityPasswordInput) communityPasswordInput.value = "";
+  if (communityOptionInput) communityOptionInput.value = "";
+  if (communityResultText) communityResultText.textContent = "Belum ada hasil";
+
+  canvas.style.transition = "none";
+  canvas.style.transform = "rotate(0deg)";
+
+  if (groupCanvas) {
+    groupCanvas.style.transition = "none";
+    groupCanvas.style.transform = "rotate(0deg)";
+  }
+
+  if (communityWheelCanvas) {
+    communityWheelCanvas.style.transition = "none";
+    communityWheelCanvas.style.transform = "rotate(0deg)";
+  }
+
+  setTimeout(() => {
+    canvas.style.transition = "transform 4s cubic-bezier(0.12, 0.82, 0.18, 1)";
+
+    if (groupCanvas) {
+      groupCanvas.style.transition = "transform 4s cubic-bezier(0.12, 0.82, 0.18, 1)";
+    }
+
+    if (communityWheelCanvas) {
+      communityWheelCanvas.style.transition = "transform 4s cubic-bezier(0.12, 0.82, 0.18, 1)";
+    }
+  }, 50);
+
+  document.body.style.pointerEvents = "auto";
+  document.body.classList.remove("focus-mode");
+
+  drawWheel();
+  renderItems();
+  renderHistory();
+  updateQuickStats();
+
+  drawGroupWheel();
+  renderGroupResults();
+
+  renderCommunityRoom();
+
+  if (typeof drawCommunityWheel === "function") {
+    drawCommunityWheel();
+  }
+
+  window.electronAPI.updateLastResult("Belum ada hasil spin.");
+
+  if (profilePhotoInput) {
+    profilePhotoInput.value = "";
+  }
+
+  renderProfileSettings();
+
+  showToast("Reset Berhasil", "Semua data lokal aplikasi berhasil dikosongkan");
+
+  setTimeout(() => {
+    if (settingDefaultUser) {
+      settingDefaultUser.focus();
+    }
+  }, 120);
+}
+
+const API_BASE_URL = "http://localhost:3000";
+
+function getSavedAuthUser() {
+  const saved = localStorage.getItem("spinyuk_auth_user");
+  return saved ? JSON.parse(saved) : null;
+}
+
+function saveAuthUser(user, token) {
+  authUser = user;
+
+  localStorage.setItem("spinyuk_auth_user", JSON.stringify(user));
+
+  if (token) {
+    localStorage.setItem("spinyuk_auth_token", token);
+  }
+
+  renderAuthStatus();
+}
+
+function clearAuthUser() {
+  authUser = null;
+
+  localStorage.removeItem("spinyuk_auth_user");
+  localStorage.removeItem("spinyuk_auth_token");
+
+  renderAuthStatus();
+}
+
+async function authRegister(payload) {
+  /*
+    NANTI KALAU BACKEND SUDAH SIAP, GANTI ISI FUNGSI INI MENJADI FETCH API:
+
+    const response = await fetch(`${API_BASE_URL}/api/auth/register`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(payload)
+    });
+
+    return await response.json();
+  */
+
+  const users = JSON.parse(localStorage.getItem("spinyuk_mock_users") || "[]");
+
+  const emailExist = users.some(
+    (user) => user.email.toLowerCase() === payload.email.toLowerCase()
+  );
+
+  if (emailExist) {
+    return {
+      success: false,
+      message: "Email sudah terdaftar"
+    };
+  }
+
+  const newUser = {
+    id: Date.now(),
+    name: payload.name,
+    email: payload.email,
+    password: payload.password
+  };
+
+  users.push(newUser);
+  localStorage.setItem("spinyuk_mock_users", JSON.stringify(users));
+
+  return {
+    success: true,
+    message: "Registrasi berhasil",
+    user: {
+      id: newUser.id,
+      name: newUser.name,
+      email: newUser.email
+    },
+    token: "mock-token-" + Date.now()
+  };
+}
+
+async function authLogin(payload) {
+  /*
+    NANTI KALAU BACKEND SUDAH SIAP, GANTI ISI FUNGSI INI MENJADI FETCH API:
+
+    const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(payload)
+    });
+
+    return await response.json();
+  */
+
+  const users = JSON.parse(localStorage.getItem("spinyuk_mock_users") || "[]");
+
+  const foundUser = users.find((user) => {
+    const identifierMatch =
+      user.email.toLowerCase() === payload.identifier.toLowerCase() ||
+      user.name.toLowerCase() === payload.identifier.toLowerCase();
+
+    return identifierMatch && user.password === payload.password;
+  });
+
+  if (!foundUser) {
+    return {
+      success: false,
+      message: "Email/username atau password salah"
+    };
+  }
+
+  return {
+    success: true,
+    message: "Login berhasil",
+    user: {
+      id: foundUser.id,
+      name: foundUser.name,
+      email: foundUser.email
+    },
+    token: "mock-token-" + Date.now()
+  };
+}
+
+function renderAuthStatus() {
+  if (!authStatusText || !authUserNameText || !authUserEmailText) return;
+
+  if (!authUser) {
+    authStatusText.textContent = "Belum Login";
+    authUserNameText.textContent = "Guest User";
+    authUserEmailText.textContent = "Login untuk menggunakan fitur Community Spin.";
+    return;
+  }
+
+  authStatusText.textContent = "Sudah Login";
+  authUserNameText.textContent = authUser.name;
+  authUserEmailText.textContent = authUser.email;
+
+  if (communityUserInput) {
+    communityUserInput.value = authUser.name;
+  }
+}
+
+function switchAuthTab(mode) {
+  if (mode === "login") {
+    loginTabBtn.classList.add("active");
+    registerTabBtn.classList.remove("active");
+
+    loginForm.classList.remove("hidden");
+    registerForm.classList.add("hidden");
+  }
+
+  if (mode === "register") {
+    registerTabBtn.classList.add("active");
+    loginTabBtn.classList.remove("active");
+
+    registerForm.classList.remove("hidden");
+    loginForm.classList.add("hidden");
+  }
+}
+
+async function handleRegister() {
+  const name = registerNameInput.value.trim();
+  const email = registerEmailInput.value.trim();
+  const password = registerPasswordInput.value.trim();
+
+  if (!name || !email || !password) {
+    showToast("Register Gagal", "Nama, email, dan password wajib diisi");
+    return;
+  }
+
+  if (password.length < 6) {
+    showToast("Password Lemah", "Password minimal 6 karakter");
+    return;
+  }
+
+  const result = await authRegister({
+    name,
+    email,
+    password
+  });
+
+  if (!result.success) {
+    showToast("Register Gagal", result.message);
+    return;
+  }
+
+  saveAuthUser(result.user, result.token);
+
+  registerNameInput.value = "";
+  registerEmailInput.value = "";
+  registerPasswordInput.value = "";
+
+  showToast("Register Berhasil", "Akun berhasil dibuat dan pengguna sudah login");
+}
+
+async function handleLogin() {
+  const identifier = loginIdentifierInput.value.trim();
+  const password = loginPasswordInput.value.trim();
+
+  if (!identifier || !password) {
+    showToast("Login Gagal", "Email/username dan password wajib diisi");
+    return;
+  }
+
+  const result = await authLogin({
+    identifier,
+    password
+  });
+
+  if (!result.success) {
+    showToast("Login Gagal", result.message);
+    return;
+  }
+
+  saveAuthUser(result.user, result.token);
+
+  loginIdentifierInput.value = "";
+  loginPasswordInput.value = "";
+
+  showToast("Login Berhasil", `Selamat datang, ${result.user.name}`);
+}
+
+function handleLogout() {
+  clearAuthUser();
+  showToast("Logout Berhasil", "Akun berhasil keluar dari aplikasi");
+}
+
+function isAuthenticated() {
+  return Boolean(authUser);
+}
+
+function requireCommunityLogin() {
+  if (isAuthenticated()) {
+    return true;
+  }
+
+  showToast(
+    "Login Diperlukan",
+    "Silakan login terlebih dahulu untuk menggunakan fitur Community Spin"
+  );
+
+  setTimeout(() => {
+    showAuthPage();
+  }, 900);
+
+  return false;
+}
+
+function getProfileName() {
+  if (authUser && authUser.name) {
+    return authUser.name;
+  }
+
+  return localStorage.getItem("spinyuk_profile_name") || "Guest User";
+}
+
+function getProfileEmail() {
+  if (authUser && authUser.email) {
+    return authUser.email;
+  }
+
+  return localStorage.getItem("spinyuk_profile_email") || "Belum login";
+}
+
+function getProfileInitial(name) {
+  const cleanName = String(name || "Guest User").trim();
+  return cleanName ? cleanName.charAt(0).toUpperCase() : "G";
+}
+
+function renderProfileSettings() {
+  const savedPhoto = localStorage.getItem("spinyuk_profile_photo");
+  const name = getProfileName();
+  const email = getProfileEmail();
+
+  if (profilePreviewName) {
+    profilePreviewName.textContent = name;
+  }
+
+  if (profilePreviewEmail) {
+    profilePreviewEmail.textContent = email;
+  }
+
+  if (profileLoginStatus) {
+    profileLoginStatus.textContent = authUser ? "Status: Sudah Login" : "Status: Guest";
+  }
+
+  if (profileNameInput) {
+    profileNameInput.value = name === "Guest User" ? "" : name;
+  }
+
+  if (profileEmailInput) {
+    profileEmailInput.value = email === "Belum login" ? "" : email;
+  }
+
+  if (profileInitialText) {
+    profileInitialText.textContent = getProfileInitial(name);
+  }
+
+  if (profilePreviewImage && profileInitialText) {
+    if (savedPhoto) {
+      profilePreviewImage.src = savedPhoto;
+      profilePreviewImage.style.display = "block";
+      profileInitialText.style.display = "none";
+    } else {
+      profilePreviewImage.removeAttribute("src");
+      profilePreviewImage.style.display = "none";
+      profileInitialText.style.display = "block";
+    }
+  }
+}
+
+function chooseProfilePhoto() {
+  if (!profilePhotoInput) return;
+  profilePhotoInput.click();
+}
+
+function handleProfilePhotoChange(event) {
+  const file = event.target.files[0];
+
+  if (!file) return;
+
+  if (!file.type.startsWith("image/")) {
+    showToast("File Salah", "Pilih file gambar untuk foto profil");
+    return;
+  }
+
+  const reader = new FileReader();
+
+  reader.onload = () => {
+    localStorage.setItem("spinyuk_profile_photo", reader.result);
+    renderProfileSettings();
+    showToast("Foto Profil", "Foto profil berhasil diperbarui");
+  };
+
+  reader.readAsDataURL(file);
+}
+
+function saveProfileSettings() {
+  const name = profileNameInput.value.trim();
+  const email = profileEmailInput.value.trim();
+
+  if (!name || !email) {
+    showToast("Profil Belum Lengkap", "Nama dan email profil wajib diisi");
+    return;
+  }
+
+  localStorage.setItem("spinyuk_profile_name", name);
+  localStorage.setItem("spinyuk_profile_email", email);
+
+  if (authUser) {
+    authUser = {
+      ...authUser,
+      name,
+      email
+    };
+
+    localStorage.setItem("spinyuk_auth_user", JSON.stringify(authUser));
+  }
+
+  if (userName) {
+    userName.value = name;
+  }
+
+  if (communityUserInput) {
+    communityUserInput.value = name;
+  }
+
+  renderAuthStatus();
+  renderProfileSettings();
+
+  showToast("Profil Disimpan", "Informasi profil berhasil diperbarui");
+}
+
+function removeProfilePhoto() {
+  localStorage.removeItem("spinyuk_profile_photo");
+
+  if (profilePhotoInput) {
+    profilePhotoInput.value = "";
+  }
+
+  renderProfileSettings();
+  showToast("Foto Dihapus", "Foto profil berhasil dihapus");
+}
+
 addBtn.addEventListener("click", addItem);
 
 itemInput.addEventListener("keydown", (event) => {
@@ -902,10 +2029,11 @@ itemInput.addEventListener("keydown", (event) => {
 
 spinBtn.addEventListener("click", spinWheel);
 
-clearBtn.addEventListener("click", () => {
-  const confirmClear = confirm("Yakin ingin menghapus semua pilihan?");
+clearBtn.addEventListener("click", (event) => {
+  event.preventDefault();
+  event.stopPropagation();
 
-  if (!confirmClear) return;
+  closeToast();
 
   items = [];
   resultText.textContent = "Belum ada hasil";
@@ -913,6 +2041,13 @@ clearBtn.addEventListener("click", () => {
   saveLocalData();
   drawWheel();
   renderItems();
+  updateQuickStats();
+
+  showToast("Pilihan Dihapus", "Semua pilihan Quick Spin berhasil dikosongkan");
+
+  setTimeout(() => {
+    itemInput.focus();
+  }, 120);
 });
 
 importBtn.addEventListener("click", async () => {
@@ -993,6 +2128,40 @@ if (groupResetConfirmCard) {
   });
 }
 
+if (settingErrorSound) {
+  settingErrorSound.addEventListener("change", () => {
+    localStorage.setItem(
+      "spinyuk_error_sound",
+      settingErrorSound.checked ? "true" : "false"
+    );
+  });
+}
+
+if (settingMusicVolume) {
+  settingMusicVolume.addEventListener("input", () => {
+    if (volumeValueText) {
+      volumeValueText.textContent = `${settingMusicVolume.value}%`;
+    }
+
+    if (backgroundMusic) {
+      backgroundMusic.volume = Number(settingMusicVolume.value) / 100;
+    }
+
+    localStorage.setItem("spinyuk_music_volume", settingMusicVolume.value);
+  });
+}
+
+if (settingBackgroundMusic) {
+  settingBackgroundMusic.addEventListener("change", () => {
+    localStorage.setItem(
+      "spinyuk_background_music",
+      settingBackgroundMusic.checked ? "true" : "false"
+    );
+
+    applyBackgroundMusicSetting();
+  });
+}
+
 exportBtn.addEventListener("click", exportHistory);
 resetBtn.addEventListener("click", resetRoom);
 
@@ -1005,6 +2174,18 @@ resetYesBtn.addEventListener("click", performResetRoom);
 resetCancelBtn.addEventListener("click", closeResetConfirm);
 prepareGroupBtn.addEventListener("click", prepareGroupSpin);
 groupSpinBtn.addEventListener("click", spinGroupName);
+communityCreateBtn.addEventListener("click", createCommunityRoom);
+communityJoinBtn.addEventListener("click", joinCommunityRoom);
+communityLeaveBtn.addEventListener("click", leaveCommunityRoom);
+communityAddOptionBtn.addEventListener("click", addCommunityOption);
+communitySpinBtn.addEventListener("click", spinCommunityOption);
+
+communityOptionInput.addEventListener("keydown", (event) => {
+  if (event.key === "Enter") {
+    addCommunityOption();
+    drawCommunityWheel();
+  }
+});
 
 if (resetGroupBtn) {
   resetGroupBtn.addEventListener("click", resetGroupSpin);
@@ -1076,35 +2257,307 @@ dropZone.addEventListener("drop", (event) => {
   reader.readAsText(file);
 });
 
+if (saveSettingsBtn) {
+  saveSettingsBtn.addEventListener("click", saveSettingsForm);
+}
+
+if (settingMusicVolume) {
+  settingMusicVolume.addEventListener("input", () => {
+    if (volumeValueText) {
+      volumeValueText.textContent = `${settingMusicVolume.value}%`;
+    }
+
+    if (backgroundMusic) {
+      backgroundMusic.volume = Number(settingMusicVolume.value) / 100;
+    }
+  });
+}
+
+if (resetAllLocalBtn) {
+  resetAllLocalBtn.addEventListener("click", (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    resetAllLocalData();
+  });
+}
+
+if (settingButtonSound) {
+  settingButtonSound.addEventListener("change", () => {
+    localStorage.setItem(
+      "spinyuk_button_sound",
+      settingButtonSound.checked ? "true" : "false"
+    );
+  });
+}
+
+if (loginTabBtn) {
+  loginTabBtn.addEventListener("click", () => switchAuthTab("login"));
+}
+
+if (registerTabBtn) {
+  registerTabBtn.addEventListener("click", () => switchAuthTab("register"));
+}
+
+if (registerBtn) {
+  registerBtn.addEventListener("click", handleRegister);
+}
+
+if (loginBtn) {
+  loginBtn.addEventListener("click", handleLogin);
+}
+
+if (logoutBtn) {
+  logoutBtn.addEventListener("click", handleLogout);
+}
+
+if (loginPasswordInput) {
+  loginPasswordInput.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") {
+      handleLogin();
+    }
+  });
+}
+
+if (registerPasswordInput) {
+  registerPasswordInput.addEventListener("keydown", (event) => {
+    if (event.key === "Enter") {
+      handleRegister();
+    }
+  });
+}
+
+if (chooseProfilePhotoBtn) {
+  chooseProfilePhotoBtn.addEventListener("click", chooseProfilePhoto);
+}
+
+if (profilePhotoInput) {
+  profilePhotoInput.addEventListener("change", handleProfilePhotoChange);
+}
+
+if (saveProfileBtn) {
+  saveProfileBtn.addEventListener("click", saveProfileSettings);
+}
+
+if (removeProfilePhotoBtn) {
+  removeProfilePhotoBtn.addEventListener("click", removeProfilePhoto);
+}
+
+function updateActiveMode(mode) {
+  const activeModeTitle = document.getElementById("activeModeTitle");
+  const activeModeDesc = document.getElementById("activeModeDesc");
+
+  if (!activeModeTitle || !activeModeDesc) return;
+
+  if (mode === "quick") {
+    activeModeTitle.textContent = "Quick Spin";
+    activeModeDesc.textContent = "Spinner utama untuk memilih satu hasil.";
+  }
+
+  if (mode === "group") {
+    activeModeTitle.textContent = "Group Spin";
+    activeModeDesc.textContent = "Mode untuk membagi nama ke beberapa kelompok.";
+  }
+  if (mode === "community") {
+    activeModeTitle.textContent = "Community Spin";
+    activeModeDesc.textContent = "Mode simulasi room bersama untuk beberapa pengguna.";
+  }
+  if (mode === "about") {
+    activeModeTitle.textContent = "Tentang SpinYuk";
+    activeModeDesc.textContent = "Informasi aplikasi dan profil kelompok.";
+  }
+}
+
+function closeAllCards() {
+  closeToast();
+
+  if (resetConfirmCard) {
+    resetConfirmCard.classList.remove("show");
+  }
+
+  if (groupResetConfirmCard) {
+    groupResetConfirmCard.classList.remove("show");
+  }
+}
+
 function openSidebar() {
   appSidebar.classList.add("open");
   sidebarOverlay.classList.add("show");
-  sidebarToggle.classList.add("hide-toggle");
+
+  if (sidebarToggle) {
+    sidebarToggle.classList.add("hide-toggle");
+  }
 }
 
 function closeSidebar() {
   appSidebar.classList.remove("open");
   sidebarOverlay.classList.remove("show");
-  sidebarToggle.classList.remove("hide-toggle");
+
+  if (sidebarToggle) {
+    sidebarToggle.classList.remove("hide-toggle");
+  }
 }
 
-sidebarToggle.addEventListener("click", openSidebar);
-sidebarClose.addEventListener("click", closeSidebar);
-sidebarOverlay.addEventListener("click", closeSidebar);
-
 function showQuickSpinPage() {
+  closeAllCards();
+
   quickSpinPage.style.display = "grid";
   groupSpinPage.classList.remove("show");
+  communitySpinPage.classList.remove("show");
+  aboutPage.classList.remove("show");
+  settingsPage.classList.remove("show");
+  authPage.classList.remove("show");
+
+  updateActiveMode("quick");
+}
+
+function showAboutPage() {
+  closeAllCards();
+
+  quickSpinPage.style.display = "none";
+  groupSpinPage.classList.remove("show");
+  communitySpinPage.classList.remove("show");
+  aboutPage.classList.add("show");
+  settingsPage.classList.remove("show");
+  authPage.classList.remove("show");
+
+  updateActiveMode("about");
+}
+
+function showSettingsPage() {
+  closeAllCards();
+
+  quickSpinPage.style.display = "none";
+  groupSpinPage.classList.remove("show");
+  communitySpinPage.classList.remove("show");
+  aboutPage.classList.remove("show");
+  settingsPage.classList.add("show");
+  authPage.classList.remove("show");
+
+  if (activeModeTitle && activeModeDesc) {
+    activeModeTitle.textContent = "Pengaturan";
+    activeModeDesc.textContent = "Kelola preferensi dan data lokal aplikasi.";
+  }
+
+  loadSettingsForm();
+  renderProfileSettings();
+}
+
+function showAuthPage() {
+  closeAllCards();
+
+  quickSpinPage.style.display = "none";
+  groupSpinPage.classList.remove("show");
+  communitySpinPage.classList.remove("show");
+  aboutPage.classList.remove("show");
+  settingsPage.classList.remove("show");
+  authPage.classList.add("show");
+
+  if (activeModeTitle && activeModeDesc) {
+    activeModeTitle.textContent = "Login";
+    activeModeDesc.textContent = "Masuk atau daftar untuk menggunakan fitur Community Spin.";
+  }
+
+  renderAuthStatus();
 }
 
 function showGroupSpinPage() {
+  closeAllCards();
+
   quickSpinPage.style.display = "none";
   groupSpinPage.classList.add("show");
+  communitySpinPage.classList.remove("show");
+  aboutPage.classList.remove("show");
+  settingsPage.classList.remove("show");
+  authPage.classList.remove("show");
+
+  updateActiveMode("group");
   drawGroupWheel();
 }
 
+function showCommunitySpinPage() {
+  closeAllCards();
+
+  quickSpinPage.style.display = "none";
+  groupSpinPage.classList.remove("show");
+  communitySpinPage.classList.add("show");
+  aboutPage.classList.remove("show");
+  settingsPage.classList.remove("show");
+  authPage.classList.remove("show");
+
+  updateActiveMode("community");
+  renderCommunityRoom();
+  drawCommunityWheel();
+}
+
+if (sidebarToggle) {
+  sidebarToggle.addEventListener("click", openSidebar);
+}
+
+if (sidebarClose) {
+  sidebarClose.addEventListener("click", closeSidebar);
+}
+
+if (sidebarOverlay) {
+  sidebarOverlay.addEventListener("click", closeSidebar);
+}
+
+function playSuccessSound() {
+  const soundEnabled =
+    localStorage.getItem("spinyuk_sound_effect") !== "false";
+
+  if (!soundEnabled || !successSound) return;
+
+  successSound.currentTime = 0;
+  successSound.volume = 0.55;
+  successSound.play().catch(() => {});
+}
+
+function playErrorSound() {
+  const errorEnabled =
+    localStorage.getItem("spinyuk_error_sound") !== "false";
+
+  if (!errorEnabled || !errorSound) return;
+
+  errorSound.currentTime = 0;
+  errorSound.volume = 0.45;
+  errorSound.play().catch(() => {});
+}
+
+function playButtonSound() {
+  const buttonSoundEnabled =
+    localStorage.getItem("spinyuk_button_sound") !== "false";
+
+  if (!buttonSoundEnabled) return;
+
+  const audioContext = new AudioContext();
+  const oscillator = audioContext.createOscillator();
+  const gainNode = audioContext.createGain();
+
+  oscillator.type = "triangle";
+  oscillator.frequency.setValueAtTime(520, audioContext.currentTime);
+  oscillator.frequency.exponentialRampToValueAtTime(
+    760,
+    audioContext.currentTime + 0.06
+  );
+
+  gainNode.gain.setValueAtTime(0.5, audioContext.currentTime);
+  gainNode.gain.exponentialRampToValueAtTime(
+    0.001,
+    audioContext.currentTime + 0.09
+  );
+
+  oscillator.connect(gainNode);
+  gainNode.connect(audioContext.destination);
+
+  oscillator.start();
+  oscillator.stop(audioContext.currentTime + 0.09);
+}
+
 sidebarLinks.forEach((link) => {
-  link.addEventListener("click", () => {
+  link.addEventListener("click", (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+
     sidebarLinks.forEach((item) => item.classList.remove("active"));
     link.classList.add("active");
 
@@ -1113,11 +2566,33 @@ sidebarLinks.forEach((link) => {
     if (menu === "quick-spin") {
       showQuickSpinPage();
       closeSidebar();
+      return;
     }
 
     if (menu === "group-spin") {
       showGroupSpinPage();
       closeSidebar();
+      return;
+    }
+    if (menu === "community-spin") {
+      showCommunitySpinPage();
+      closeSidebar();
+      return;
+    }
+    if (menu === "about-spinyuk") {
+      showAboutPage();
+      closeSidebar();
+      return;
+    }
+    if (menu === "settings") {
+      showSettingsPage();
+      closeSidebar();
+      return;
+    }
+    if (menu === "auth") {
+      showAuthPage();
+      closeSidebar();
+      return;
     }
   });
 });
@@ -1125,8 +2600,25 @@ sidebarLinks.forEach((link) => {
 document.addEventListener("keydown", (event) => {
   if (event.key === "Escape") {
     closeSidebar();
+    closeAllCards();
   }
 });
+
+document.addEventListener(
+  "click",
+  (event) => {
+    const clickedButton = event.target.closest("button");
+
+    if (!clickedButton) return;
+    if (clickedButton.disabled) return;
+
+    playButtonSound();
+  },
+  true
+);
+
+authUser = getSavedAuthUser();
+renderAuthStatus();
 
 loadLocalData();
 drawWheel();
@@ -1134,3 +2626,4 @@ renderItems();
 renderHistory();
 updateQuickStats();
 drawGroupWheel();
+renderCommunityRoom();

@@ -223,3 +223,4 @@ ipcMain.handle("show-notification", async (event, payload) => {
 ipcMain.on("update-last-result", (event, result) => {
   lastSpinResult = result || "Belum ada hasil spin.";
 });
+
